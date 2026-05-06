@@ -3,7 +3,7 @@
  * Plugin Name: Service Areas
  * Plugin URI:  https://craftandcloud.com
  * Description: Manage service locations and the services offered in each area, with a styled frontend grid.
- * Version:     1.0.2
+ * Version:     1.2.0
  * Author:      Craft & Cloud
  * Author URI:  https://craftandcloud.com
  * License:     GPL-2.0+
@@ -12,7 +12,29 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'CC_SA_VERSION', '1.0.2' );
+$cc_sa_header = get_file_data( __FILE__, [ 'Version' => 'Version' ] );
+define( 'CC_SA_VERSION', $cc_sa_header['Version'] );
+
+// =====================================================
+// AUTO-UPDATES VIA GITHUB
+// Requires the plugin-update-checker library to be placed in
+// /service-areas/plugin-update-checker/ inside this plugin folder.
+// Library: https://github.com/YahnisElsts/plugin-update-checker
+// =====================================================
+$cc_sa_puc_path = plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
+if ( file_exists( $cc_sa_puc_path ) ) {
+	require_once $cc_sa_puc_path;
+	$cc_sa_update_checker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/craft-and-cloud/service-areas',
+		__FILE__,
+		'service-areas'
+	);
+	// For private repos, define CC_SA_GITHUB_TOKEN in wp-config.php.
+	if ( defined( 'CC_SA_GITHUB_TOKEN' ) ) {
+		$cc_sa_update_checker->setAuthentication( CC_SA_GITHUB_TOKEN );
+	}
+	$cc_sa_update_checker->setBranch( 'main' );
+}
 
 // =====================================================
 // SANITIZATION HELPERS
